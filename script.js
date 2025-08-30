@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadMap(mapName) {
         mapDisplay.innerHTML = `<p class="p-8 text-center text-gray-500">Loading map for ${mapName.replace('_', ' ')}...</p>`;
         try {
-            const response = await fetch(`./Maps/${mapName}.svg`); 
+            // This line is now updated to look in the main folder
+            const response = await fetch(`./${mapName}.svg`); 
             if (!response.ok) {
                 throw new Error(`Map not found: ${mapName}.svg.`);
             }
