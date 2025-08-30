@@ -1,26 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mapDisplay = document.getElementById('map-display');
     const locationLinks = document.querySelectorAll('.nav-link');
-    const defaultMap = 'Main_Gate';
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
 
     async function loadMap(mapName) {
-        // Custom safety message
-        mapDisplay.innerHTML = `
-            <div class="p-8 text-center flex items-center justify-center h-full">
-                <p class="text-gray-700 text-lg">
-                    Take care of yourself, your safety comes first. We know that there are shortcuts to some of the mentioned places, but these shortcuts are unsafe and require the accompaniment of a responsible person, so we have identified the safest routes for you. Good luck.
-                </p>
-            </div>
-        `;
-
+        mapDisplay.innerHTML = `<p class="p-8 text-center text-gray-500">Loading map...</p>`;
         try {
-            // Looks for maps in the main folder
             const response = await fetch(`./${mapName}.svg`); 
             if (!response.ok) {
                 throw new Error(`Map not found: ${mapName}.svg.`);
             }
             const svgData = await response.text();
             mapDisplay.innerHTML = svgData;
+
+            if (window.innerWidth < 768) {
+                hideSidebar();
+            }
         } catch (error) {
             console.error('Error loading map:', error);
             mapDisplay.innerHTML = `<p class="p-8 text-center text-red-500">Error: Could not load map. ${error.message}</p>`;
@@ -34,6 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
         activeLink.classList.add('active');
     }
 
+    function showSidebar() {
+        sidebar.classList.remove('sidebar-hidden');
+        sidebar.classList.add('sidebar-visible');
+    }
+
+    function hideSidebar() {
+        sidebar.classList.remove('sidebar-visible');
+        sidebar.classList.add('sidebar-hidden');
+    }
+
+    sidebarToggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('sidebar-hidden')) {
+            showSidebar();
+        } else {
+            hideSidebar();
+        }
+    });
+
     locationLinks.forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -44,10 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function initialize() {
-        const defaultLink = document.querySelector(`.nav-link[data-target="${defaultMap}"]`);
-        if (defaultLink) {
-            setActiveLink(defaultLink);
-            loadMap(defaultMap);
+        // No default map is loaded. The safety message in the HTML is shown instead.
+        if (window.innerWidth < 768) {
+            hideSidebar(); 
+        } else {
+            showSidebar(); 
         }
     }
     initialize();
